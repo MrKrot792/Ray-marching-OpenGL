@@ -19,6 +19,11 @@ float smin( float a, float b, float k )
     return min(a,b) - h*h*h*k*(1.0/6.0);
 }
 
+float sdPlane( vec3 p, vec3 n, float h )
+{
+    return dot(p,normalize(n)) + h;
+}
+
 float sdCappedCylinder( vec3 p, float h, float r )
 {
     vec2 d = abs(vec2(length(p.xz),p.y)) - vec2(r,h);
@@ -55,7 +60,7 @@ float map_the_world(vec3 p)
     float dis = distances[0];
     for(int i = 0; i < 2; i++)
     {
-        dis = smin(distances[i], dis, 0.2);
+        dis = smin(distances[i], dis, 0.1);
     }
 
     return dis;
