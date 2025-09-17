@@ -55,12 +55,13 @@ float map_the_world(vec3 p)
     //                             sdSphere(vec3(0, 3.5, -3) - p, 0.75));
 
     float distances[] = float[](sdSphere(vec3(0, 0, -3) - p, 2),
-                                sdRoundedCylinder(vec3(0, 0, -3) - p, 1.85, 0.05, 0.1));
+                                sdCappedCylinder(vec3(0, 0, -3) - p, 0.125, 4));
 
     float dis = distances[0];
     for(int i = 0; i < 2; i++)
     {
-        dis = smin(distances[i], dis, 0.1);
+        //dis = smin(distances[i], dis, 0.1);
+        dis = min(distances[i], dis);
     }
 
     return dis;
@@ -86,7 +87,7 @@ void main()
     vec2 uv = (gl_FragCoord.xy / resolution) * 2.0 - 1.0;
     uv.x *= resolution.x / resolution.y;
 
-    vec3 position = vec3(0, 1, 3);
+    vec3 position = vec3(0, 1, 5);
     vec3 direction = normalize(vec3(uv, -1.0));
 
     vec3 color = vec3(0, 0, 0);
@@ -94,6 +95,16 @@ void main()
     for(int i = 0; i < MAX_ITERATIONS; i++)
     {
         float dis = map_the_world(position);
+
+        vec3 gravityCenter = vec3(0, 0, -3);
+        float G = 0.0025;
+
+        vec3 toCenter = normalize(gravityCenter - position);
+        float blackHoleDistance = length(gravityCenter - position);
+
+        direction = normalize(mix(direction, toCenter, G * blackHoleDistance));
+
+        position += direction * dis;
 
         if(dis <= EPSILON) // Hit!
         {
@@ -107,8 +118,6 @@ void main()
             break;
         }
 
-        position += direction * dis;
-        
         if(dis >= MAX_DISTANCE) { break; }
     }
 
