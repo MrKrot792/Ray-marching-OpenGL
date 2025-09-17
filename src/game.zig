@@ -56,8 +56,8 @@ pub const Game = struct {
         gl.compileShader(vertexShader);
 
         const vertexResult = try gl.getShaderInfoLog(vertexShader, allocator);
-        std.log.err("Vertex shader: {s}\n", .{vertexResult});
-        defer allocator.free(vertexResult);
+        if(vertexResult.len > 0) std.log.err("Vertex shader: {s}\n", .{vertexResult});
+        allocator.free(vertexResult);
 
         var fragmentSource = try readFile(allocator, "assets/fragment.frag");
 
@@ -67,8 +67,8 @@ pub const Game = struct {
         gl.compileShader(fragmentShader);
 
         const fragmentResult = try gl.getShaderInfoLog(fragmentShader, allocator);
-        std.log.err("Fragment shader: {s}\n", .{fragmentResult});
-        defer allocator.free(fragmentResult);
+        if(fragmentResult.len > 0) std.log.err("Fragment shader: {s}\n", .{fragmentResult});
+        allocator.free(fragmentResult);
 
         const shaderProgram = gl.createProgram();
         defer shaderProgram.delete();
